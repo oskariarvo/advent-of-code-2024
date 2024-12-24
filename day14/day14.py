@@ -98,9 +98,54 @@ def brutus_check(data, tiles):
         if tree_y == secs:
             print(secs)
             break
+
+# Find christmas tree using chinese remainder theorem
+def remainder_check(data, tiles):
+    secs = 0
+    tree_x = None
+    tree_y = None
+    while True:
+        secs += 1
+        robots = set()
+        # Move robots according to seconds
+        for item in data:
+            moved = calc_future(item, secs, tiles)
+            robots.add(moved)
+        # Find in which value the x arranges so we can iterate every 103 second
+        if tree_x == None:
+            for x in range(tiles[1]):
+                total_x = 0
+                for value in robots:
+                    if value[1] == x:
+                        total_x += 1
+                if total_x > 15:
+                    tree_x = secs
+        # Find if y values arrange themselves
+        for y in range(tiles[0]):
+            total_y = 0
+            for value in robots:
+                if value[0] == y:
+                    total_y += 1
+            if total_y > 15:
+                tree_y = secs
+        # Find the christmas tree using Chinese Remainder Theorem
+        if tree_y != None and tree_x != None:
+            j = tiles[1] % tiles[0]
+            i = abs((tree_y % tiles[0]) - (tree_x % tiles[0]))
+            if j > 1:
+                x = (1-tiles[0]) / 2
+                while x <= 0:
+                    x += tiles[0]
+                j = (x * i) % tiles[0]
+            else:
+                j = i
+            result = tiles[1]*j+tree_x
+            print(int(result))
+            break
     
 # Part 1
 print(safety_factor(test_cleaned_data, 100, (11, 7)))
 print(safety_factor(cleaned_data, 100, (101, 103)))
 # Part 2
 brutus_check(cleaned_data, (101, 103))
+remainder_check(cleaned_data, (101, 103))
